@@ -5,6 +5,7 @@
 <title>button // fazolin/design-system</title>
 <link rel="stylesheet" href="../tokens/colors.css">
 <link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
@@ -59,14 +60,14 @@ body {
 .btn:hover {
     color: var(--color-corrupt);
     border-color: var(--color-corrupt);
-    animation: rgb-flash 80ms steps(2, end) 1;
+    animation: fx-flash 80ms steps(2, end) 1;
 }
 
 .btn:active {
     background: var(--color-signal);
     color: var(--color-void);
     border-color: var(--color-signal);
-    animation: none;
+    animation: fx-jitter 60ms steps(4, end) 1;
 }
 
 .btn:focus-visible {
@@ -105,12 +106,10 @@ body {
     border-color: transparent;
 }
 
-@keyframes rgb-flash {
-    0% {
-        text-shadow: -1px 0 var(--color-mesh), 1px 0 var(--color-corrupt);
-    }
-    100% {
-        text-shadow: none;
+@media (prefers-reduced-motion: reduce) {
+    .btn:hover,
+    .btn:active {
+        animation: none;
     }
 }
 </style>
