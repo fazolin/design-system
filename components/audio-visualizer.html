@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>audio-visualizer // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body { padding: 56px 64px; display: flex; flex-direction: column; gap: 48px; max-width: 1100px; }
+
+.section-label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    border-bottom: 1px solid var(--color-mesh-dim);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.av canvas {
+    display: block;
+    width: 100%;
+    height: 120px;
+    background: var(--color-void);
+    border: 1px solid rgba(240, 240, 240, 0.08);
+}
+
+.av__hud {
+    display: flex;
+    gap: 24px;
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--color-mesh-dim);
+    text-transform: uppercase;
+    margin-top: 10px;
+}
+
+.note {
+    font-family: var(--font-hud);
+    font-size: 11px;
+    color: rgba(240, 240, 240, 0.5);
+    margin-top: 12px;
+    letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<div class="av">
+    <div class="section-label">// waveform</div>
+    <canvas id="cv-wave" width="1600" height="240"></canvas>
+    <div class="av__hud">
+        <span>MODE: WAVEFORM</span>
+        <span>SOURCE: SYNTH_SINE_220Hz</span>
+        <span>FFT: 2048</span>
+    </div>
+</div>
+
+<div class="av">
+    <div class="section-label">// frequency (peaks turn corrupt)</div>
+    <canvas id="cv-freq" width="1600" height="240"></canvas>
+    <div class="av__hud">
+        <span>MODE: FREQUENCY</span>
+        <span>SOURCE: SYNTH_NOISE</span>
+        <span>BINS: 64</span>
+        <span>PEAK_THRESHOLD: 0.85</span>
+    </div>
+</div>
+
+<div class="av">
+    <div class="section-label">// oscilloscope (x-y)</div>
+    <canvas id="cv-osc" width="1600" height="320"></canvas>
+    <div class="av__hud">
+        <span>MODE: OSCILLOSCOPE</span>
+        <span>SOURCE: SYNTH_LISSAJOUS</span>
+    </div>
+    <div class="note">canvas is the data — no axis labels, no grid, no decoration</div>
+</div>
+
+<script>
+// synthetic data so we can preview without microphone permission.
+// real consumer wires AnalyserNode.getByteTimeDomainData / getByteFrequencyData.
+
+const MESH = '#00FFFF';
+const CORRUPT = '#FF0033';
+let t = 0;
+
+function drawWave() {
+    const c = document.getElementById('cv-wave');
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = MESH; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x < W; x++) {
+        const y = H/2 + Math.sin((x/W) * Math.PI * 12 + t) * (H/2 - 20) * (0.6 + 0.4*Math.sin(t*0.3 + x*0.005));
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+function drawFreq() {
+    const c = document.getElementById('cv-freq');
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    const bins = 64;
+    const bw = (W - bins) / bins;
+    for (let i = 0; i < bins; i++) {
+        const seed = Math.sin(i*0.7 + t*0.4) * 0.5 + 0.5;
+        const noise = Math.random() * 0.3;
+        const v = Math.min(1, seed * 0.7 + noise);
+        const h = v * (H - 8);
+        ctx.fillStyle = v > 0.85 ? CORRUPT : MESH;
+        ctx.fillRect(i * (bw + 1), H - h, bw, h);
+    }
+}
+
+function drawOsc() {
+    const c = document.getElementById('cv-osc');
+    const ctx = c.getContext('2d');
+    const W = c.width, H = c.height;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = MESH; ctx.lineWidth = 1;
+    ctx.beginPath();
+    const cx = W/2, cy = H/2, r = Math.min(W, H) * 0.4;
+    for (let i = 0; i < 800; i++) {
+        const phase = i / 800 * Math.PI * 2;
+        const x = cx + Math.sin(phase * 3 + t * 0.5) * r;
+        const y = cy + Math.sin(phase * 2 + t * 0.7) * r * 0.6;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+}
+
+function loop() {
+    t += 0.05;
+    drawWave();
+    drawFreq();
+    drawOsc();
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>
