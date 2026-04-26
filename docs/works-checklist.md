@@ -2,7 +2,9 @@
 
 checklist obrigatório antes de publicar qualquer work no domínio fazolin.com. se algum item falha, a work não publica.
 
-## identidade visual
+> **escopo:** os itens de identidade visual abaixo aplicam-se à **interface** da work — entrada, loading, error, HUD, controles, fallbacks. o **interior da obra** (o canvas, o áudio-reativo, o point cloud, a coisa renderizada que É a obra) pode quebrar qualquer regra. ver `CLAUDE.md` para a divisão precisa.
+
+## identidade visual (interface)
 
 - [ ] background `#000000` em todos os contextos (incluindo loading state)
 - [ ] paleta restrita: void, signal, mesh, corrupt — nenhuma cor adicional
