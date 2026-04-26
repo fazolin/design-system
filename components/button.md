@@ -17,8 +17,8 @@ botão padrão fazolin. zero ornamento, zero suavização. existe pra disparar a
 | estado | mudança |
 |---|---|
 | **default** | borda + texto em `signal` |
-| **hover** | borda e texto viram `corrupt`. RGB-split flash de 80ms (`text-shadow: -1px 0 mesh, 1px 0 corrupt` por 80ms, depois assenta no estado corrupt sólido) |
-| **active** | inverte: `background: signal`, `color: void`, sem borda visível (a borda fica do mesmo tom do bg) |
+| **hover** | borda e texto viram `corrupt`. dispara `fx-flash` (RGB-split de 80ms via `tokens/glitch.css`) e assenta no estado corrupt sólido |
+| **active** | inverte: `background: signal`, `color: void`. dispara `fx-jitter` (deslocamento de 1px em 4 steps, 60ms) |
 | **focus-visible** | outline `1px solid var(--color-mesh)`, `outline-offset: 2px`. nunca outline padrão do browser |
 | **disabled** | `opacity: 0.3`, `cursor: not-allowed`, sem hover |
 
@@ -26,6 +26,10 @@ botão padrão fazolin. zero ornamento, zero suavização. existe pra disparar a
 
 - `.btn--destructive` — borda já em `corrupt`, texto em `corrupt`. hover: bg vira `corrupt`, texto `void`. uso: delete, reset, abort.
 - `.btn--ghost` — sem borda, só texto em `signal`. hover RGB-split. uso: nav inline, ações secundárias.
+
+## glitch vocabulary usado
+
+importa `tokens/glitch.css` — provê `fx-flash`, `fx-jitter` e `fx-alive`. botão usa só os dois primeiros. `fx-alive` (idle tick) é proibido em UI de ação.
 
 ## anti-padrões aplicados
 
