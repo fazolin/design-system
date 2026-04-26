@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>type-test // fazolin/design-system</title>
+
+<!-- Display candidates -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/oswald@5/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fjalla-one@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/big-shoulders-display@5/900.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/encode-sans-condensed@5/900.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/anton@5/400.css">
+
+<!-- HUD candidates -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/chakra-petch@5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/azeret-mono@5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-mono@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/martian-mono@5/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/500.css">
+
+<style>
+:root {
+    --void: #000000;
+    --signal: #F0F0F0;
+    --mesh: #00FFFF;
+    --mesh-dim: rgba(0, 255, 255, 0.4);
+    --corrupt: #FF0033;
+    --corrupt-dim: rgba(255, 0, 51, 0.5);
+    --hairline: rgba(240, 240, 240, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--void); color: var(--signal); }
+
+body {
+    padding: 56px 64px 120px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--signal);
+    padding-bottom: 18px;
+    margin-bottom: 64px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.head .id {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+.head .meta {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--mesh);
+    text-transform: uppercase;
+}
+
+.section-label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mesh);
+    margin: 80px 0 24px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--mesh-dim);
+}
+.section-label:first-of-type { margin-top: 0; }
+
+.candidate {
+    padding: 36px 0;
+    border-top: 1px solid var(--hairline);
+}
+.candidate:first-of-type { border-top: 0; padding-top: 14px; }
+
+.candidate-id {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 4px;
+}
+.candidate-id .num {
+    color: var(--mesh);
+    margin-right: 14px;
+}
+.candidate-note {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(240, 240, 240, 0.5);
+    margin-bottom: 30px;
+}
+
+/* Display test — 70px with RGB split */
+.display {
+    font-size: 70px;
+    line-height: 0.92;
+    letter-spacing: -0.005em;
+    text-shadow:
+        -2px 0 0 var(--corrupt),
+         2px 0 0 var(--mesh);
+}
+
+/* Medium test — 22px clean */
+.medium {
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    margin-top: 22px;
+    color: var(--signal);
+}
+
+/* HUD test — 12px small */
+.hud-line {
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.14em;
+    margin-top: 16px;
+    color: var(--mesh);
+    text-transform: uppercase;
+}
+
+/* Display fonts */
+.f-oswald       { font-family: 'Oswald', sans-serif; font-weight: 700; }
+.f-fjalla       { font-family: 'Fjalla One', sans-serif; font-weight: 400; }
+.f-bigshoulders { font-family: 'Big Shoulders Display', sans-serif; font-weight: 900; }
+.f-encode       { font-family: 'Encode Sans Condensed', sans-serif; font-weight: 900; }
+.f-anton        { font-family: 'Anton', sans-serif; font-weight: 400; }
+
+/* HUD fonts */
+.f-chakra    { font-family: 'Chakra Petch', monospace; font-weight: 500; }
+.f-azeret    { font-family: 'Azeret Mono', monospace; font-weight: 500; }
+.f-spacemono { font-family: 'Space Mono', monospace; font-weight: 400; }
+.f-martian   { font-family: 'Martian Mono', monospace; font-weight: 500; }
+.f-jetbrains { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+/* Footer scanline */
+footer {
+    margin-top: 120px;
+    padding-top: 24px;
+    border-top: 1px solid var(--signal);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--mesh-dim);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+    <div class="id">type-test // fazolin / design-system</div>
+    <div class="meta">etapa_01 // typography_resolution</div>
+</header>
+
+<div class="section-label">// display // bold</div>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">D.01</span>oswald — bold (700)</div>
+    <div class="candidate-note">condensed grotesque, geometric, monolinear at bold weight</div>
+    <div class="display f-oswald">FAZOLIN</div>
+    <div class="medium f-oswald">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-oswald">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">D.02</span>fjalla one — regular (400)</div>
+    <div class="candidate-note">narrower than oswald, single weight, slightly less geometric</div>
+    <div class="display f-fjalla">FAZOLIN</div>
+    <div class="medium f-fjalla">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-fjalla">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">D.03</span>big shoulders display — black (900)</div>
+    <div class="candidate-note">contemporary, sharp terminals, more character — heavier presence</div>
+    <div class="display f-bigshoulders">FAZOLIN</div>
+    <div class="medium f-bigshoulders">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-bigshoulders">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">D.04</span>encode sans condensed — black (900)</div>
+    <div class="candidate-note">neutral grotesque, less narrow than oswald, more reading-friendly</div>
+    <div class="display f-encode">FAZOLIN</div>
+    <div class="medium f-encode">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-encode">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">D.05</span>anton — regular (400) — sugestão</div>
+    <div class="candidate-note">single weight black by design, extreme condensed, pure monolinear — best glitch survival</div>
+    <div class="display f-anton">FAZOLIN</div>
+    <div class="medium f-anton">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-anton">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<div class="section-label">// hud // system</div>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">H.01</span>chakra petch — medium (500)</div>
+    <div class="candidate-note">semi-mono, slight techno character, sharp corners</div>
+    <div class="display f-chakra">FAZOLIN</div>
+    <div class="medium f-chakra">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-chakra">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">H.02</span>azeret mono — medium (500)</div>
+    <div class="candidate-note">contemporary mono, slightly humanist, soft terminals</div>
+    <div class="display f-azeret">FAZOLIN</div>
+    <div class="medium f-azeret">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-azeret">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">H.03</span>space mono — regular (400)</div>
+    <div class="candidate-note">retro-futurist mono, distinctive ink traps, bracketed terminals</div>
+    <div class="display f-spacemono">FAZOLIN</div>
+    <div class="medium f-spacemono">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-spacemono">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">H.04</span>martian mono — medium (500)</div>
+    <div class="candidate-note">designed for code interfaces, geometric, very even rhythm</div>
+    <div class="display f-martian">FAZOLIN</div>
+    <div class="medium f-martian">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-martian">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<section class="candidate">
+    <div class="candidate-id"><span class="num">H.05</span>jetbrains mono — medium (500) — sugestão</div>
+    <div class="candidate-note">real engineering interface mono — closest to ex machina / b.r. 2049 functional ui</div>
+    <div class="display f-jetbrains">FAZOLIN</div>
+    <div class="medium f-jetbrains">SELF.DATA — DIGITAL ARTIST</div>
+    <div class="hud-line f-jetbrains">SCAN_ACTIVE // LANDMARKS: 468 // FPS: 60 // CORRUPT: 0.87</div>
+</section>
+
+<footer>
+    <span>// candidates: 10 — display:5 hud:5</span>
+    <span>signal &gt;&gt; void</span>
+</footer>
+
+</body>
+</html>
