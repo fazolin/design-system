@@ -1,0 +1,8 @@
+:root {
+    --color-void:        #000000;
+    --color-signal:      #F0F0F0;
+    --color-mesh:        #00FFFF;
+    --color-mesh-dim:    rgba(0, 255, 255, 0.4);
+    --color-corrupt:     #FF0033;
+    --color-corrupt-dim: rgba(255, 0, 51, 0.5);
+}
