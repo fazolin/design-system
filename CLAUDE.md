@@ -142,15 +142,41 @@ Fundo sempre `--color-void`. Texto sempre HUD.
 - Detectar GPU low-end via `utils/detect-gpu.ts` e cair em fallback estático.
 - Respeitar `prefers-reduced-motion`: substituir glitch por estado parado, não animar.
 
+## Escopo das regras — interface vs obra
+
+As regras deste design-system valem para **interface**: tudo que envolve, embala ou conduz à obra. A obra em si pode quebrar qualquer regra.
+
+**Interface (segue design-system, sem exceção):**
+- página de entrada da work (request de permissão, call-to-action)
+- loading state, error state, denied state
+- HUD sobreposto, controles, parâmetros expostos
+- nav, footer, créditos, links externos
+- mobile fallback / aviso de incompatibilidade
+- qualquer texto explicativo, label, status
+
+**Obra / interior (pode quebrar tudo):**
+- o canvas em si — a coisa renderizada que é a obra
+- cores fora da paleta, sim
+- tipografia diferente (ou nenhuma)
+- formas, gradientes, animações com easing curvado, ruído fora do vocabulário fx-*
+- duração de motion arbitrária, easing arbitrário
+- regras próprias documentadas no `CLAUDE.md` local da work
+
+A obra é onde fazolin testa o que quer testar. A interface é onde fazolin **não** quer ter que pensar — ela é coerente em todo o universo, a obra é onde a coerência se rompe propositalmente.
+
+Ponto de transição: o instante em que o usuário "entra" na obra (clica GRANT ACCESS, dispara START, fecha o aviso de mobile). Antes desse ponto, design-system. Depois, regras da work.
+
 ## Ao começar trabalho em qualquer repo de fazolin
 
 1. Ler este `CLAUDE.md` (do design-system).
-2. Ler o `CLAUDE.md` local do repo da work.
+2. Ler o `CLAUDE.md` local do repo da work — pode ter regras próprias para o **interior** da obra.
 3. Ler `docs/works-checklist.md` se for publicar.
 4. Garantir que `tokens/` está disponível.
 5. Só então código.
 
-Conflito entre regras locais e design-system: design-system vence em qualquer decisão visual ou de identidade. Repo local vence só em decisões internas da work.
+Conflito entre regras locais e design-system:
+- **interface** → design-system vence sempre.
+- **interior da obra** → CLAUDE.md local da work vence, mesmo se contradiz o design-system.
 
 ## Repo
 
