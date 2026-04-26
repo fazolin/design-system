@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>colors // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body { padding: 56px 64px; display: flex; flex-direction: column; gap: 56px; }
+
+.head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid var(--color-signal);
+    padding-bottom: 18px;
+}
+.head .id { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; }
+.head .meta { font-size: 11px; letter-spacing: 0.15em; color: var(--color-mesh); text-transform: uppercase; }
+
+.section-label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    border-bottom: 1px solid var(--color-mesh-dim);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+}
+
+.swatches { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+.swatch {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    align-items: stretch;
+    border: 1px solid rgba(240, 240, 240, 0.1);
+}
+.swatch__color { min-height: 140px; }
+.swatch__meta {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+}
+.swatch__name {
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.swatch__hex {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--color-mesh);
+    font-variant-numeric: tabular-nums;
+}
+.swatch__use {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(240, 240, 240, 0.5);
+    line-height: 1.5;
+}
+
+.pairing {
+    padding: 28px;
+    border: 1px solid rgba(240, 240, 240, 0.1);
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+.pairings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+</style>
+</head>
+<body>
+
+<header class="head">
+    <div class="id">colors // fazolin / design-system</div>
+    <div class="meta">4 colors // not 5</div>
+</header>
+
+<section>
+    <div class="section-label">// palette</div>
+    <div class="swatches">
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-void); border-right: 1px solid rgba(240,240,240,0.1);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">VOID</div>
+                    <div class="swatch__hex">#000000</div>
+                </div>
+                <div class="swatch__use">background, sempre. preto absoluto. zero offset, zero "almost black".</div>
+            </div>
+        </div>
+
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-signal);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">SIGNAL</div>
+                    <div class="swatch__hex">#F0F0F0</div>
+                </div>
+                <div class="swatch__use">texto base, traço fixo, borda estrutural. presença que não responde a estado.</div>
+            </div>
+        </div>
+
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-mesh);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">MESH</div>
+                    <div class="swatch__hex">#00FFFF</div>
+                </div>
+                <div class="swatch__use">dado vivo, foco, scan ativo, processo em curso. ciano puro — não teal, não cyan amaciado.</div>
+            </div>
+        </div>
+
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-corrupt);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">CORRUPT</div>
+                    <div class="swatch__hex">#FF0033</div>
+                </div>
+                <div class="swatch__use">erro real, hover destrutivo, glitch como obra. nunca decoração.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="section-label">// dim variants (separators only)</div>
+    <div class="swatches">
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-mesh-dim);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">MESH-DIM</div>
+                    <div class="swatch__hex">rgba(0, 255, 255, 0.4)</div>
+                </div>
+                <div class="swatch__use">separadores entre seções HUD. nunca para texto.</div>
+            </div>
+        </div>
+
+        <div class="swatch">
+            <div class="swatch__color" style="background: var(--color-corrupt-dim);"></div>
+            <div class="swatch__meta">
+                <div>
+                    <div class="swatch__name">CORRUPT-DIM</div>
+                    <div class="swatch__hex">rgba(255, 0, 51, 0.5)</div>
+                </div>
+                <div class="swatch__use">picos secundários em audio-visualizer, alerta sustentado de fundo.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="section-label">// pairings on void</div>
+    <div class="pairings">
+        <div class="pairing" style="color: var(--color-signal);">SIGNAL ON VOID</div>
+        <div class="pairing" style="color: var(--color-mesh);">MESH ON VOID</div>
+        <div class="pairing" style="color: var(--color-corrupt);">CORRUPT ON VOID</div>
+    </div>
+</section>
+
+<section>
+    <div class="section-label">// inverted (signal as bg)</div>
+    <div class="pairings">
+        <div class="pairing" style="background: var(--color-signal); color: var(--color-void);">VOID ON SIGNAL</div>
+        <div class="pairing" style="background: var(--color-signal); color: var(--color-corrupt);">CORRUPT ON SIGNAL</div>
+        <div class="pairing" style="background: var(--color-corrupt); color: var(--color-void);">VOID ON CORRUPT</div>
+    </div>
+</section>
+
+</body>
+</html>
