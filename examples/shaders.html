@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>shaders // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--color-void); color: var(--color-signal); min-height: 100vh; font-family: var(--font-hud); }
+body { padding: 56px 64px; display: flex; flex-direction: column; gap: 36px; }
+
+.head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid var(--color-signal);
+    padding-bottom: 18px;
+}
+.head .id { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; }
+.head .meta { font-size: 11px; letter-spacing: 0.15em; color: var(--color-mesh); text-transform: uppercase; }
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.card { border: 1px solid rgba(240, 240, 240, 0.12); }
+.card__header {
+    display: flex; justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(240, 240, 240, 0.12);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.card__header .name { color: var(--color-signal); }
+.card__header .meta { color: var(--color-mesh-dim); }
+.card canvas { display: block; width: 100%; height: 240px; background: var(--color-void); }
+
+.error {
+    padding: 16px;
+    color: var(--color-corrupt);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.note {
+    font-size: 11px;
+    color: rgba(240, 240, 240, 0.5);
+    letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+    <div class="id">shaders // fazolin / design-system</div>
+    <div class="meta">5 // glsl 300 es</div>
+</header>
+
+<div class="note">source: synthetic test pattern (gradient + grid). u_intensity slowly oscillating 0.4 ↔ 0.9.</div>
+
+<div class="grid">
+    <div class="card">
+        <div class="card__header"><span class="name">// rgb-split</span><span class="meta">u_intensity osc</span></div>
+        <canvas id="cv-rgb"></canvas>
+        <div class="error" id="err-rgb"></div>
+    </div>
+    <div class="card">
+        <div class="card__header"><span class="name">// chromatic-aberration</span><span class="meta">u_intensity osc</span></div>
+        <canvas id="cv-chrom"></canvas>
+        <div class="error" id="err-chrom"></div>
+    </div>
+    <div class="card">
+        <div class="card__header"><span class="name">// crt-scanlines</span><span class="meta">u_intensity osc</span></div>
+        <canvas id="cv-crt"></canvas>
+        <div class="error" id="err-crt"></div>
+    </div>
+    <div class="card">
+        <div class="card__header"><span class="name">// noise</span><span class="meta">simplex 2D</span></div>
+        <canvas id="cv-noise"></canvas>
+        <div class="error" id="err-noise"></div>
+    </div>
+    <div class="card" style="grid-column: span 2;">
+        <div class="card__header"><span class="name">// datamosh</span><span class="meta">requires u_prev — feedback enabled</span></div>
+        <canvas id="cv-mosh"></canvas>
+        <div class="error" id="err-mosh"></div>
+    </div>
+</div>
+
+<script>
+const VERT = `#version 300 es
+in vec2 a_pos;
+out vec2 v_uv;
+void main() {
+    v_uv = (a_pos + 1.0) * 0.5;
+    gl_Position = vec4(a_pos, 0.0, 1.0);
+}`;
+
+// shaders are inlined here so the demo runs from file:// (browsers block fetch on file://).
+// the canonical source lives in ../shaders/*.glsl — keep them in sync if edited.
+const SHADERS = {
+    'rgb-split': `#version 300 es
+precision mediump float;
+uniform sampler2D u_texture;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_intensity;
+in vec2 v_uv;
+out vec4 fragColor;
+void main() {
+    float angle = u_time * 0.3;
+    vec2 dir = vec2(cos(angle), sin(angle));
+    float jitter = u_intensity * 12.0;
+    vec2 px = jitter / u_resolution;
+    float r = texture(u_texture, v_uv + dir * px).r;
+    float g = texture(u_texture, v_uv).g;
+    float b = texture(u_texture, v_uv + -dir * px).b;
+    fragColor = vec4(r, g, b, 1.0);
+}`,
+    'chromatic-aberration': `#version 300 es
+precision mediump float;
+uniform sampler2D u_texture;
+uniform vec2 u_resolution;
+uniform float u_intensity;
+in vec2 v_uv;
+out vec4 fragColor;
+void main() {
+    vec2 center = vec2(0.5);
+    vec2 dir = v_uv - center;
+    float dist = length(dir);
+    float k = u_intensity * 0.04 * dist;
+    float r = texture(u_texture, v_uv + dir * k).r;
+    float g = texture(u_texture, v_uv).g;
+    float b = texture(u_texture, v_uv - dir * k * 0.7).b;
+    fragColor = vec4(r, g, b, 1.0);
+}`,
+    'crt-scanlines': `#version 300 es
+precision mediump float;
+uniform sampler2D u_texture;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_intensity;
+in vec2 v_uv;
+out vec4 fragColor;
+void main() {
+    vec4 base = texture(u_texture, v_uv);
+    float line = sin(v_uv.y * u_resolution.y * 1.05 - u_time * 1.2);
+    float scan = mix(1.0, 0.75 + 0.25 * step(0.0, line), u_intensity);
+    float row = mod(v_uv.y * u_resolution.y, 3.0);
+    vec3 mask = vec3(
+        row < 1.0 ? 1.0 : 0.85,
+        row >= 1.0 && row < 2.0 ? 1.0 : 0.85,
+        row >= 2.0 ? 1.0 : 0.85
+    );
+    vec2 vc = v_uv - 0.5;
+    float vig = 1.0 - dot(vc, vc) * 0.6 * u_intensity;
+    fragColor = vec4(base.rgb * scan * mask * vig, base.a);
+}`,
+    'noise': `#version 300 es
+precision mediump float;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_intensity;
+in vec2 v_uv;
+out vec4 fragColor;
+vec3 permute(vec3 x) { return mod((x * 34.0 + 1.0) * x, 289.0); }
+float simplex2(vec2 v) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i  = floor(v + dot(v, C.yy));
+    vec2 x0 = v - i + dot(i, C.xx);
+    vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod(i, 289.0);
+    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+    vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
+    m = m * m; m = m * m;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+    vec3 g;
+    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+}
+void main() {
+    vec2 p = v_uv * 6.0 + vec2(0.0, u_time * 0.3);
+    float n = simplex2(p);
+    n = (n + 1.0) * 0.5;
+    n = mix(0.5, n, u_intensity);
+    fragColor = vec4(vec3(n), 1.0);
+}`,
+    'datamosh': `#version 300 es
+precision mediump float;
+uniform sampler2D u_texture;
+uniform sampler2D u_prev;
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform float u_intensity;
+in vec2 v_uv;
+out vec4 fragColor;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+void main() {
+    vec2 block = floor(v_uv * u_resolution / 8.0);
+    float h = hash(block + floor(u_time * 4.0));
+    vec2 offset = (vec2(hash(block), hash(block + 17.0)) - 0.5) * 0.05 * u_intensity;
+    vec3 cur  = texture(u_texture, v_uv).rgb;
+    vec3 prev = texture(u_prev, v_uv + offset).rgb;
+    float ghost = step(1.0 - u_intensity * 0.6, h);
+    vec3 col = mix(cur, prev * 0.92 + cur * 0.08, ghost);
+    fragColor = vec4(col, 1.0);
+}`
+};
+
+function getShader(name) { return SHADERS[name]; }
+
+function makeSourceTexture(gl) {
+    // synthetic pattern: gradient + grid + colour blocks. 256×256.
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const ctx = c.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 256, 256);
+    grad.addColorStop(0, '#000');
+    grad.addColorStop(0.5, '#F0F0F0');
+    grad.addColorStop(1, '#000');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, 256, 256);
+    ctx.fillStyle = '#00FFFF';
+    ctx.fillRect(48, 48, 64, 64);
+    ctx.fillStyle = '#FF0033';
+    ctx.fillRect(160, 144, 48, 48);
+    ctx.strokeStyle = 'rgba(240,240,240,0.4)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 256; i += 16) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+    }
+    ctx.fillStyle = '#F0F0F0';
+    ctx.font = 'bold 28px monospace';
+    ctx.fillText('FAZOLIN', 32, 220);
+
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    return tex;
+}
+
+function compile(gl, src, type) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(sh) || 'shader compile error');
+    }
+    return sh;
+}
+
+function program(gl, vs, fs) {
+    const v = compile(gl, vs, gl.VERTEX_SHADER);
+    const f = compile(gl, fs, gl.FRAGMENT_SHADER);
+    const p = gl.createProgram();
+    gl.attachShader(p, v);
+    gl.attachShader(p, f);
+    gl.bindAttribLocation(p, 0, 'a_pos');
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+        throw new Error(gl.getProgramInfoLog(p) || 'link error');
+    }
+    return p;
+}
+
+function setupQuad(gl) {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    return vao;
+}
+
+function runShader({ canvasId, errId, shaderName, withPrev = false }) {
+    const canvas = document.getElementById(canvasId);
+    const errEl = document.getElementById(errId);
+    canvas.width = canvas.clientWidth * devicePixelRatio;
+    canvas.height = canvas.clientHeight * devicePixelRatio;
+    const gl = canvas.getContext('webgl2');
+    if (!gl) { errEl.textContent = 'WEBGL2_UNAVAILABLE'; return; }
+
+    const frag = getShader(shaderName);
+    if (!frag) { errEl.textContent = 'SHADER_NOT_FOUND: ' + shaderName; return; }
+
+    let prog;
+    try { prog = program(gl, VERT, frag); }
+    catch (e) { errEl.textContent = 'COMPILE: ' + e.message.split('\n')[0]; return; }
+
+    const vao = setupQuad(gl);
+    const tex = makeSourceTexture(gl);
+
+    // Optional ping-pong for datamosh feedback
+    let fb = null, prevTex = null;
+    if (withPrev) {
+        prevTex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, prevTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        fb = gl.createFramebuffer();
+    }
+
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uIntensity = gl.getUniformLocation(prog, 'u_intensity');
+    const uResolution = gl.getUniformLocation(prog, 'u_resolution');
+    const uTexture = gl.getUniformLocation(prog, 'u_texture');
+    const uPrev = gl.getUniformLocation(prog, 'u_prev');
+
+    function draw(now) {
+        const t = now / 1000;
+        const intensity = 0.4 + 0.5 * (Math.sin(t * 0.6) * 0.5 + 0.5);
+
+        gl.useProgram(prog);
+        gl.bindVertexArray(vao);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+
+        if (uResolution) gl.uniform2f(uResolution, canvas.width, canvas.height);
+        if (uTime) gl.uniform1f(uTime, t);
+        if (uIntensity) gl.uniform1f(uIntensity, intensity);
+
+        if (uTexture) {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tex);
+            gl.uniform1i(uTexture, 0);
+        }
+        if (withPrev && uPrev) {
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, prevTex);
+            gl.uniform1i(uPrev, 1);
+        }
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        if (withPrev) {
+            // copy current frame to prevTex for next call
+            gl.bindTexture(gl.TEXTURE_2D, prevTex);
+            gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, canvas.width, canvas.height, 0);
+        }
+
+        requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+}
+
+runShader({ canvasId: 'cv-rgb',   errId: 'err-rgb',   shaderName: 'rgb-split' });
+runShader({ canvasId: 'cv-chrom', errId: 'err-chrom', shaderName: 'chromatic-aberration' });
+runShader({ canvasId: 'cv-crt',   errId: 'err-crt',   shaderName: 'crt-scanlines' });
+runShader({ canvasId: 'cv-noise', errId: 'err-noise', shaderName: 'noise' });
+runShader({ canvasId: 'cv-mosh',  errId: 'err-mosh',  shaderName: 'datamosh', withPrev: true });
+</script>
+
+</body>
+</html>
