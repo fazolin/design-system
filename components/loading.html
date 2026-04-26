@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>loading // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body {
+    padding: 56px 64px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 56px 64px;
+    max-width: 1200px;
+}
+
+.cell {
+    border-top: 1px solid var(--color-mesh-dim);
+    padding-top: 18px;
+    min-height: 180px;
+}
+
+.label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    margin-bottom: 28px;
+}
+
+.note {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(240, 240, 240, 0.5);
+    margin-top: 16px;
+}
+
+/* counter */
+.counter {
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-signal);
+    font-variant-numeric: tabular-nums;
+}
+.counter .live { color: var(--color-mesh); }
+
+/* scanline */
+.scanline-box {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    border: 1px solid rgba(240, 240, 240, 0.15);
+    overflow: hidden;
+}
+.scanline-box::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--color-mesh);
+    animation: scan 1600ms linear infinite;
+}
+@keyframes scan {
+    0%   { top: 0; }
+    100% { top: 100%; }
+}
+
+/* glitch-text */
+.glitch-text {
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.2em;
+    color: var(--color-signal);
+}
+.glitch-text .scrambler {
+    display: inline-block;
+    color: var(--color-mesh);
+    animation: scramble 320ms steps(8, end) infinite;
+}
+@keyframes scramble {
+    0%   { content: 'I'; }
+    12%  { content: 'X'; }
+    25%  { content: 'N'; }
+    37%  { content: '#'; }
+    50%  { content: 'I'; }
+    62%  { content: '@'; }
+    75%  { content: 'T'; }
+    87%  { content: '/'; }
+    100% { content: 'I'; }
+}
+
+/* cardinal pulse */
+.cardinal {
+    position: relative;
+    width: 32px;
+    height: 32px;
+}
+.cardinal span {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(240, 240, 240, 0.15);
+}
+.cardinal .n { top: 0;  left: 50%; transform: translateX(-50%); }
+.cardinal .e { right: 0; top: 50%; transform: translateY(-50%); }
+.cardinal .s { bottom: 0; left: 50%; transform: translateX(-50%); }
+.cardinal .w { left: 0;  top: 50%; transform: translateY(-50%); }
+
+.cardinal .n { animation: pulse 600ms steps(1, end) infinite 0ms; }
+.cardinal .e { animation: pulse 600ms steps(1, end) infinite 150ms; }
+.cardinal .s { animation: pulse 600ms steps(1, end) infinite 300ms; }
+.cardinal .w { animation: pulse 600ms steps(1, end) infinite 450ms; }
+
+@keyframes pulse {
+    0%, 49%   { background: var(--color-mesh); }
+    50%, 100% { background: rgba(240, 240, 240, 0.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scanline-box::before,
+    .glitch-text .scrambler,
+    .cardinal span { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cell">
+    <div class="label">// counter</div>
+    <div class="counter">LOADING ... <span class="live">0.43</span> MB / 1.20 MB</div>
+    <div class="note">use when progress is measurable</div>
+</div>
+
+<div class="cell">
+    <div class="label">// scanline</div>
+    <div class="scanline-box"></div>
+    <div class="note">use for continuous ops without known progress</div>
+</div>
+
+<div class="cell">
+    <div class="label">// glitch-text</div>
+    <div class="glitch-text">N<span class="scrambler">I</span>TIALIZING</div>
+    <div class="note">use for boot / handshake states</div>
+</div>
+
+<div class="cell">
+    <div class="label">// cardinal-pulse</div>
+    <div class="cardinal">
+        <span class="n"></span><span class="e"></span><span class="s"></span><span class="w"></span>
+    </div>
+    <div class="note">small inline waiting indicator</div>
+</div>
+
+</body>
+</html>
