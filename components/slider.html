@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>slider // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body { padding: 56px 64px; display: flex; flex-direction: column; gap: 56px; max-width: 720px; }
+
+.label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    border-bottom: 1px solid var(--color-mesh-dim);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+}
+
+.field-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-signal);
+    margin-bottom: 14px;
+    opacity: 0.6;
+}
+
+.slider {
+    display: grid;
+    grid-template-columns: 1fr 64px;
+    align-items: center;
+    gap: 16px;
+}
+
+.slider__track {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 1px;
+    background: rgba(240, 240, 240, 0.2);
+    outline: none;
+    cursor: pointer;
+    /* fill via background gradient — single-stop step, no soft transition */
+    background-image: linear-gradient(to right, var(--color-mesh) 0%, var(--color-mesh) var(--fill, 50%), transparent var(--fill, 50%));
+    background-repeat: no-repeat;
+}
+
+.slider__track::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 8px;
+    background: var(--color-mesh);
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+}
+.slider__track::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    background: var(--color-mesh);
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.slider__track:hover::-webkit-slider-thumb { background: var(--color-corrupt); }
+.slider__track:hover::-moz-range-thumb { background: var(--color-corrupt); }
+
+.slider__track:focus-visible::-webkit-slider-thumb { outline: 1px solid var(--color-mesh); outline-offset: 2px; }
+
+.slider__value {
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--color-mesh);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.slider:hover .slider__value {
+    color: var(--color-corrupt);
+    animation: fx-flash 80ms steps(2, end) 1;
+}
+
+.slider--disabled { opacity: 0.3; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .slider:hover .slider__value { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div>
+    <div class="label">// default</div>
+    <div class="field-label">INTENSITY</div>
+    <div class="slider">
+        <input type="range" min="0" max="100" value="50" class="slider__track" style="--fill: 50%" oninput="this.style.setProperty('--fill', this.value + '%'); this.nextElementSibling.textContent = this.value">
+        <span class="slider__value">50</span>
+    </div>
+</div>
+
+<div>
+    <div class="field-label">CORRUPTION</div>
+    <div class="slider">
+        <input type="range" min="0" max="1" step="0.01" value="0.87" class="slider__track" style="--fill: 87%" oninput="this.style.setProperty('--fill', (this.value*100) + '%'); this.nextElementSibling.textContent = parseFloat(this.value).toFixed(2)">
+        <span class="slider__value">0.87</span>
+    </div>
+</div>
+
+<div>
+    <div class="field-label">FRAME_BLEED</div>
+    <div class="slider">
+        <input type="range" min="0" max="200" value="24" class="slider__track" style="--fill: 12%" oninput="this.style.setProperty('--fill', (this.value/2) + '%'); this.nextElementSibling.textContent = this.value">
+        <span class="slider__value">24</span>
+    </div>
+</div>
+
+<div>
+    <div class="field-label">DISABLED</div>
+    <div class="slider slider--disabled">
+        <input type="range" min="0" max="100" value="30" class="slider__track" style="--fill: 30%" disabled>
+        <span class="slider__value">30</span>
+    </div>
+</div>
+
+</body>
+</html>
