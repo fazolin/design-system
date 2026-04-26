@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>glitch vocabulary // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body {
+    padding: 64px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 56px;
+}
+
+.section {
+    border-top: 1px solid var(--color-mesh-dim);
+    padding-top: 24px;
+}
+.section:first-child { border-top: 0; padding-top: 0; }
+
+.label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    margin-bottom: 8px;
+}
+.note {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(240, 240, 240, 0.5);
+    margin-bottom: 28px;
+}
+
+.wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 96px;
+    line-height: 0.95;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+}
+
+.target {
+    display: inline-block;
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    border: 1px solid var(--color-signal);
+    cursor: pointer;
+}
+.target:hover { animation: fx-flash 80ms steps(2, end) 1; color: var(--color-corrupt); border-color: var(--color-corrupt); }
+.target:active { animation: fx-jitter 60ms steps(4, end) 1; }
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.status .dot {
+    width: 6px; height: 6px;
+    background: var(--color-mesh);
+}
+</style>
+</head>
+<body>
+
+<div class="section">
+    <div class="label">// fx-alive — idle tick (open in browser to see)</div>
+    <div class="note">irregular RGB ticks on a 12s loop. asymmetric on purpose — feels organic, not metronomic.</div>
+    <div class="wordmark fx-alive">FAZOLIN</div>
+</div>
+
+<div class="section">
+    <div class="label">// fx-flash — hover the target</div>
+    <div class="note">80ms RGB-split that fades to settled corrupt state.</div>
+    <span class="target">HOVER ME</span>
+</div>
+
+<div class="section">
+    <div class="label">// fx-jitter — click the target</div>
+    <div class="note">1px translate in 4 steps over 60ms. uses :active so click-and-hold to see.</div>
+    <span class="target">CLICK ME</span>
+</div>
+
+<div class="section">
+    <div class="label">// fx-alive on small status</div>
+    <div class="note">scale check: idle tick stays subtle on UI-sized text too.</div>
+    <div class="status">
+        <span class="dot fx-alive"></span>
+        <span class="fx-alive">SIGNAL_ACTIVE</span>
+    </div>
+</div>
+
+</body>
+</html>
