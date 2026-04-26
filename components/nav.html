@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>nav // fazolin/design-system</title>
+<link rel="stylesheet" href="../tokens/colors.css">
+<link rel="stylesheet" href="../tokens/typography.css">
+<link rel="stylesheet" href="../tokens/glitch.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    background: var(--color-void);
+    color: var(--color-signal);
+    min-height: 100vh;
+    font-family: var(--font-hud);
+}
+body { padding: 56px 64px; display: flex; flex-direction: column; gap: 56px; max-width: 900px; }
+
+.section-label {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-mesh);
+    border-bottom: 1px solid var(--color-mesh-dim);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+}
+
+.nav { display: flex; gap: 24px; }
+.nav--vertical { flex-direction: column; gap: 14px; align-items: flex-start; }
+
+.nav__item {
+    font-family: var(--font-hud);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-signal);
+    text-decoration: none;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: color 120ms linear;
+}
+.nav__item:hover {
+    color: var(--color-corrupt);
+    animation: fx-flash 80ms steps(2, end) 1;
+}
+.nav__item--current { color: var(--color-mesh); }
+.nav__item--disabled { opacity: 0.3; pointer-events: none; }
+.nav__item:focus-visible { outline: 1px solid var(--color-mesh); outline-offset: 4px; }
+
+.nav--counter .nav__item {
+    display: inline-flex;
+    gap: 10px;
+}
+.nav--counter .nav__item::before {
+    content: attr(data-num);
+    color: var(--color-mesh-dim);
+    font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav__item:hover { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div>
+    <div class="section-label">// horizontal</div>
+    <nav class="nav nav--horizontal">
+        <a class="nav__item" href="#">HOME</a>
+        <a class="nav__item nav__item--current" href="#">WORKS</a>
+        <a class="nav__item" href="#">MANIFESTO</a>
+        <a class="nav__item" href="#">CONTACT</a>
+        <a class="nav__item nav__item--disabled" href="#">ARCHIVE</a>
+    </nav>
+</div>
+
+<div>
+    <div class="section-label">// vertical</div>
+    <nav class="nav nav--vertical">
+        <a class="nav__item" href="#">INDEX</a>
+        <a class="nav__item nav__item--current" href="#">SELF.DATA</a>
+        <a class="nav__item" href="#">CHANNEL_DROP</a>
+        <a class="nav__item" href="#">PHANTOM_LIMB</a>
+        <a class="nav__item" href="#">SIGNAL_LOST</a>
+    </nav>
+</div>
+
+<div>
+    <div class="section-label">// counter (works index)</div>
+    <nav class="nav nav--vertical nav--counter">
+        <a class="nav__item" href="#" data-num="01_">SELF.DATA</a>
+        <a class="nav__item" href="#" data-num="02_">CHANNEL_DROP</a>
+        <a class="nav__item nav__item--current" href="#" data-num="03_">PHANTOM_LIMB</a>
+        <a class="nav__item" href="#" data-num="04_">SIGNAL_LOST</a>
+        <a class="nav__item" href="#" data-num="05_">DEAD_PIXELS</a>
+    </nav>
+</div>
+
+</body>
+</html>
